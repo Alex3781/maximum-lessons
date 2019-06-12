@@ -1,0 +1,41 @@
+import tkinter
+import requests
+import bs4
+from datetime import datetime
+url = "http://www.cbr.ru/scripts/XML_daily.asp"
+today = datetime.now().strftime("%d/%m/%Y")
+payload = {"data_req": today}
+response = requests.get(url, params=payload)
+soup = bs4.BeautifulSoup(response.content, "lxml")
+def get_course(id):
+    valute = soup.find("valute", {"id": id})
+    nominal = valute.nominal
+    name = nominal.next_sibling
+    value = valute.value
+    return " {} {} = {}руб.".format(nominal.text, name.text, value.text)
+window=tkinter.Tk()
+window.geometry("600x500")
+window.title("Курс валюты")
+logo=tkinter.PhotoImage(file="logo.png")
+pic=tkinter.Label(image=logo)
+pic.place(x=0,y=0)
+label=tkinter.Label(text="ValuteN: Курс рубля",font="Arial 22")
+label.place(x=200,y=10)
+def get_dollar():
+    usd=tkinter.Label(text=get_course("R01235"),font="arial 21")
+    usd.place(x=120,y=200)
+button=tkinter.Button(fg="black",bg="#e3e9f9",text="Доллар", font="Arial 18",command=get_dollar)
+button.place(x=10,y=160)
+def get_euro():
+    eur=tkinter.Label(text=get_course("R01239"),font="arial 21")
+    eur.place(x=120,y=240)
+button2=tkinter.Button(fg="black",bg="#e3e9f9",text="Евро", font="Arial 20",command=get_euro)
+button2.place(x=10,y=215)
+def get_hrivn():
+    hrivn=tkinter.Label(text=get_course("R01720"),font="arial 21")
+    hrivn.place(x=120,y=280)
+button3=tkinter.Button(fg="black",bg="#e3e9f9",text="Гривны", font="Arial 19",command=get_hrivn)
+button3.place(x=10,y=280)
+course_info=tkinter.Label(text="Курс на{}".format(today.replace("/",".")),font="arial 22")
+course_info.place(x=210,y=50)
+window.mainloop()
